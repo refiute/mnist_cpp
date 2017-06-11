@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <array>
+#include <cstdlib>
 #include <iostream>
 #include <numeric>
 #include <random>
-#include <tuple>
 #include <tuple>
 
 #include "data.hpp"
@@ -17,17 +17,24 @@ const string TEST_IMAGE = "./data/t10k-images-idx3-ubyte";
 const string TEST_LABEL = "./data/t10k-labels-idx1-ubyte";
 
 const int NUM_TRAIN = 20;
-const int NUM_MINIBATCH = 50;
+const int NUM_MINIBATCH = 10;
 
 int main(int argc, char **argv) {
   cout << "load datasets:" << endl;
   Dataset train(TRAIN_IMAGE, TRAIN_LABEL), test(TEST_IMAGE, TEST_LABEL);
 
-  train.load_dataset();
+  if (!train.load_dataset()) {
+    cerr << "cannot load train dataset" << endl;
+    exit(1);
+  }
   cout << "\t"
        << "train data size: " << train.get_size() << endl;
 
   test.load_dataset();
+  if (!train.load_dataset()) {
+    cerr << "cannot load test dataset" << endl;
+    exit(1);
+  }
   cout << "\t"
        << "test data size: " << test.get_size() << endl;
   cout << "\t"
