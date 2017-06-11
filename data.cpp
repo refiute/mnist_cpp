@@ -1,10 +1,14 @@
 #include "data.hpp"
 
 #include <cstdlib>
-#include <endian.h>
 #include <fstream>
 #include <iostream>
 using namespace std;
+
+int be32toh(int x){
+	return ((x>>24)&0xff) | ((x>>8)&0xff00) |
+		((x<<8)&0xff0000) | ((x<<24)&0xff000000);
+}
 
 bool Dataset::load_images(string path) {
   ifstream ifs(path, ios::binary | ios::in);
