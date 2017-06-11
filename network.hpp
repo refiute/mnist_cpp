@@ -15,6 +15,7 @@ private:
 
   // weight[n_curr_layer][n_curr_unit][n_bef_unit]
   vector<vector<vector<float>>> weight;
+  vector<vector<vector<float>>> error;
 
   float activate(float x);
   float d_activate(float x);
@@ -23,7 +24,8 @@ public:
   MultiClassifiedNetwork(const char *filename);
   MultiClassifiedNetwork(vector<int> layer_size);
   pair<float, bool> forward(vector<float> x, int t);
-  void backward(int t, float eta);
+  void backward(int t);
+  void update_weight(float eta);
   int predict();
   void save(const string filename);
 };

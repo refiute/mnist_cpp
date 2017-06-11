@@ -17,6 +17,7 @@ const string TEST_IMAGE = "./data/t10k-images-idx3-ubyte";
 const string TEST_LABEL = "./data/t10k-labels-idx1-ubyte";
 
 const int NUM_TRAIN = 20;
+const int NUM_MINIBATCH = 50;
 
 int main(int argc, char **argv) {
   cout << "load datasets:" << endl;
@@ -74,7 +75,9 @@ cout << "\t" << "done" << endl;
       train_loss += loss;
       train_correct += is_correct;
 
-      net.backward(train.get_label(random_idx[i]), learning_rate);
+      net.backward(train.get_label(random_idx[i]));
+      if ((i + 1) % NUM_MINIBATCH == 0)
+        net.update_weight(learning_rate);
     }
     cout << endl;
 
