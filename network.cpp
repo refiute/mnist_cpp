@@ -9,16 +9,20 @@
 
 using namespace std;
 
-float MultiClassifiedNetwork::activate(const float x) {
-  // return max((double)x, 0.);
-  return 1 / (1 + exp(-x));
+float relu(const float x) { return max((double)x, 0.); }
+
+float d_relu(const float x) { return (x > 0) ? 1 : 0; }
+
+float sigmoid(const float x) { return 1 / (1 + exp(-x)); }
+
+float d_sigmoid(const float x) {
+  float sig = sigmoid(x);
+  return (1 - sig) * sig;
 }
 
-float MultiClassifiedNetwork::d_activate(const float x) {
-  // return (x > 0) ? 1 : 0;
-  float act = activate(x);
-  return (1 - act) * act;
-}
+float MultiClassifiedNetwork::activate(const float x) { return relu(x); }
+
+float MultiClassifiedNetwork::d_activate(const float x) { return d_relu(x); }
 
 MultiClassifiedNetwork::MultiClassifiedNetwork(vector<int> layer_size)
     : layer_size(layer_size) {

@@ -24,11 +24,11 @@ int main(int argc, char **argv) {
 
   int num_train = NUM_TRAIN;
   int num_minibatch = NUM_MINIBATCH;
-  string model_filename = "";
+  string input_model_filename = "", output_model_filename = "best";
 
   int opt;
   opterr = 0;
-  while ((opt = getopt(argc, argv, "hb:e:m:")) != -1) {
+  while ((opt = getopt(argc, argv, "hb:e:m:o:")) != -1) {
     switch (opt) {
     case 'e':
       num_train = atoi(optarg);
@@ -39,18 +39,23 @@ int main(int argc, char **argv) {
       break;
 
     case 'm':
-      model_filename = optarg;
+      input_model_filename = optarg;
+      break;
+
+    case 'o':
+      output_model_filename = optarg;
+      output_model_filename += ".model";
       break;
 
     case 'h':
       fprintf(stdout, "Usage: %s [-h] [-b minibatch_size] [-e n_epoch] [-m "
-                      "path_to_model_file]",
+                      "path_to_model_file] [-o path_to_model_output]",
               argv[0]);
       exit(0);
 
     default:
       fprintf(stderr, "Usage: %s [-h] [-b minibatch_size] [-e n_epoch] [-m "
-                      "path_to_model_file]",
+                      "path_to_model_file] [-o path_to_model_output]",
               argv[0]);
       exit(1);
     }
@@ -77,7 +82,7 @@ int main(int argc, char **argv) {
        << "done" << endl;
 
   MultiClassifiedNetwork net;
-  if (model_filename.empty()) {
+  if (input_model_filename.empty()) {
     cout << "init network:" << endl;
     vector<int> layer_size = {{28 * 28, 1000, 1000, 10}};
     net = MultiClassifiedNetwork(layer_size);
@@ -85,7 +90,7 @@ int main(int argc, char **argv) {
          << "done" << endl;
   } else {
     cout << "load network model" << endl;
-    net = MultiClassifiedNetwork(model_filename);
+    net = MultiClassifiedNetwork(input_model_filename);
     cout << "\t"
          << "done" << endl;
   }
@@ -162,7 +167,7 @@ int main(int argc, char **argv) {
            << "best loss!" << endl;
 
       best_loss = test_loss;
-      net.save("best.model");
+      net.save(output_model_filename);
     }
   }
 }
