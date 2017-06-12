@@ -63,7 +63,10 @@ MultiClassifiedNetwork::MultiClassifiedNetwork(vector<int> layer_size)
 }
 
 pair<float, bool> MultiClassifiedNetwork::forward(vector<float> x, int t) {
-  if (x.size() != layer_size[0]) {
+	if (!layer_size.size()) {
+		cerr << "uninitialized layer" << endl;
+		exit(1);
+	} else if (x.size() != layer_size[0]) {
     cerr << "input layer size is not correct" << endl;
     exit(1);
   }
@@ -172,8 +175,8 @@ void MultiClassifiedNetwork::save(const string filename) {
   ofs.close();
 }
 
-MultiClassifiedNetwork::MultiClassifiedNetwork(const char *filename) {
-  ifstream ifs(filename);
+MultiClassifiedNetwork::MultiClassifiedNetwork(const string filename) {
+  ifstream ifs(filename.c_str());
 
   if (!ifs) {
     cerr << "cannot open model file: " << filename << endl;
@@ -209,10 +212,10 @@ MultiClassifiedNetwork::MultiClassifiedNetwork(const char *filename) {
     input[l].resize(size);
     weight[l].resize(size + 1);
     error[l].resize(size + 1);
-    for (int m = 0; m < size + 1; m++) {
-      weight[l][m].resize(before_size);
-      error[l].resize(before_size);
-      for (int n = 0; n < before_size; n++) {
+    for (int m = 0; m < size; m++) {
+      weight[l][m].resize(before_size + 1);
+      error[l][m].resize(before_size + 1);
+      for (int n = 0; n < before_size + 1; n++) {
         ifs >> weight[l][m][n];
         error[l][m][n] = 0;
       }
