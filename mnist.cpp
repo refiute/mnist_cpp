@@ -22,35 +22,39 @@ const int NUM_MINIBATCH = 1;
 
 int main(int argc, char **argv) {
 
-	int num_train = NUM_TRAIN;
-	int num_minibatch = NUM_MINIBATCH;
-	string model_filename = "";
+  int num_train = NUM_TRAIN;
+  int num_minibatch = NUM_MINIBATCH;
+  string model_filename = "";
 
-	int opt;
-	opterr = 0;
-	while((opt = getopt(argc, argv, "hb:e:m:")) != -1) {
-		switch (opt) {
-			case 'e':
-				num_train = atoi(optarg);
-				break;
+  int opt;
+  opterr = 0;
+  while ((opt = getopt(argc, argv, "hb:e:m:")) != -1) {
+    switch (opt) {
+    case 'e':
+      num_train = atoi(optarg);
+      break;
 
-			case 'b':
-				num_minibatch = atoi(optarg);
-				break;
+    case 'b':
+      num_minibatch = atoi(optarg);
+      break;
 
-			case 'm':
-				model_filename = optarg;
-				break;
+    case 'm':
+      model_filename = optarg;
+      break;
 
-			case 'h':
-				fprintf(stdout ,"Usage: %s [-h] [-b minibatch_size] [-e n_epoch] [-m path_to_model_file]", argv[0]);
-				exit(0);
+    case 'h':
+      fprintf(stdout, "Usage: %s [-h] [-b minibatch_size] [-e n_epoch] [-m "
+                      "path_to_model_file]",
+              argv[0]);
+      exit(0);
 
-			default:
-				fprintf(stderr, "Usage: %s [-h] [-b minibatch_size] [-e n_epoch] [-m path_to_model_file]", argv[0]);
-				exit(1);
-		}
-	}
+    default:
+      fprintf(stderr, "Usage: %s [-h] [-b minibatch_size] [-e n_epoch] [-m "
+                      "path_to_model_file]",
+              argv[0]);
+      exit(1);
+    }
+  }
 
   cout << "load datasets:" << endl;
   Dataset train(TRAIN_IMAGE, TRAIN_LABEL), test(TEST_IMAGE, TEST_LABEL);
@@ -72,28 +76,28 @@ int main(int argc, char **argv) {
   cout << "\t"
        << "done" << endl;
 
-
-	MultiClassifiedNetwork net;
-	if (model_filename.empty()) {
-		cout << "init network:" << endl;
-		vector<int> layer_size = {{28 * 28, 1000, 1000, 10}};
-		net = MultiClassifiedNetwork(layer_size);
-		cout << "\t"
-			<< "done" << endl;
-	} else {
-		cout << "load network model" << endl;
-		net = MultiClassifiedNetwork(model_filename);
-		cout << "\t" << "done" << endl;
-	}
+  MultiClassifiedNetwork net;
+  if (model_filename.empty()) {
+    cout << "init network:" << endl;
+    vector<int> layer_size = {{28 * 28, 1000, 1000, 10}};
+    net = MultiClassifiedNetwork(layer_size);
+    cout << "\t"
+         << "done" << endl;
+  } else {
+    cout << "load network model" << endl;
+    net = MultiClassifiedNetwork(model_filename);
+    cout << "\t"
+         << "done" << endl;
+  }
 
   float best_loss = 1e9;
   float learning_rate = 1;
   vector<int> random_idx(train.get_size());
   iota(random_idx.begin(), random_idx.end(), 0);
-	shuffle(random_idx.begin(), random_idx.end(), mt19937());
+  shuffle(random_idx.begin(), random_idx.end(), mt19937());
 
-	cout << "minibatch size: " << num_minibatch << endl;
-	cout << "train epoch: " << num_train << endl;
+  cout << "minibatch size: " << num_minibatch << endl;
+  cout << "train epoch: " << num_train << endl;
   for (int epoch = 0; epoch < num_train; epoch++) {
     cout << "epoch " << epoch + 1 << ": " << endl;
 

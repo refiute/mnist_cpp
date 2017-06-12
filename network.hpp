@@ -21,7 +21,7 @@ private:
   float d_activate(float x);
 
 public:
-	MultiClassifiedNetwork(){}
+  MultiClassifiedNetwork() {}
   MultiClassifiedNetwork(const string filename);
   MultiClassifiedNetwork(vector<int> layer_size);
   pair<float, bool> forward(vector<float> x, int t);

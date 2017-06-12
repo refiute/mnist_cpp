@@ -10,12 +10,12 @@
 using namespace std;
 
 float MultiClassifiedNetwork::activate(const float x) {
-	// return max((double)x, 0.)
+  // return max((double)x, 0.);
   return 1 / (1 + exp(-x));
 }
 
 float MultiClassifiedNetwork::d_activate(const float x) {
-	// return (x > 0) ? 1 : 0;
+  // return (x > 0) ? 1 : 0;
   float act = activate(x);
   return (1 - act) * act;
 }
@@ -63,10 +63,10 @@ MultiClassifiedNetwork::MultiClassifiedNetwork(vector<int> layer_size)
 }
 
 pair<float, bool> MultiClassifiedNetwork::forward(vector<float> x, int t) {
-	if (!layer_size.size()) {
-		cerr << "uninitialized layer" << endl;
-		exit(1);
-	} else if (x.size() != layer_size[0]) {
+  if (!layer_size.size()) {
+    cerr << "uninitialized layer" << endl;
+    exit(1);
+  } else if (x.size() != layer_size[0]) {
     cerr << "input layer size is not correct" << endl;
     exit(1);
   }
