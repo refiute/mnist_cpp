@@ -1,10 +1,14 @@
 #include "data.hpp"
 
 #include <cstdlib>
-#include <endian.h>
 #include <fstream>
 #include <iostream>
 using namespace std;
+
+int swap_bytes(int x) {
+  return ((x >> 24) & 0xff) | ((x >> 8) & 0xff00) | ((x << 8) & 0xff0000) |
+         ((x << 24) & 0xff000000);
+}
 
 bool Dataset::load_images(string path) {
   ifstream ifs(path, ios::binary | ios::in);
@@ -16,7 +20,7 @@ bool Dataset::load_images(string path) {
 
   int read_tmp = 0;
   ifs.read((char *)&read_tmp, 4);
-  read_tmp = be32toh(read_tmp);
+  read_tmp = swap_bytes(read_tmp);
   if (num_data != 0 && num_data != read_tmp) {
     cerr << "data size isn't correct" << endl;
     return false;
@@ -24,9 +28,9 @@ bool Dataset::load_images(string path) {
   num_data = read_tmp;
 
   ifs.read((char *)&read_tmp, 4);
-  image_height = be32toh(read_tmp);
+  image_height = swap_bytes(read_tmp);
   ifs.read((char *)&read_tmp, 4);
-  image_width = be32toh(read_tmp);
+  image_width = swap_bytes(read_tmp);
 
   images.resize(num_data);
   for (int n = 0; n < num_data; n++) {
@@ -60,7 +64,7 @@ bool Dataset::load_labels(string path) {
 
   int tmp;
   ifs.read((char *)&tmp, 4);
-  tmp = be32toh(tmp);
+  tmp = swap_bytes(tmp);
   if (num_data != 0 && num_data != tmp) {
     cerr << "data size isn't correct" << endl;
     return false;

@@ -1,9 +1,9 @@
 #include <algorithm>
 #include <array>
+#include <cstdlib>
 #include <iostream>
 #include <numeric>
 #include <random>
-#include <tuple>
 #include <tuple>
 
 #include "data.hpp"
@@ -17,20 +17,30 @@ const string TEST_IMAGE = "./data/t10k-images-idx3-ubyte";
 const string TEST_LABEL = "./data/t10k-labels-idx1-ubyte";
 
 const int NUM_TRAIN = 20;
+const int NUM_MINIBATCH = 100;
 
 int main(int argc, char **argv) {
   cout << "load datasets:" << endl;
   Dataset train(TRAIN_IMAGE, TRAIN_LABEL), test(TEST_IMAGE, TEST_LABEL);
 
-  train.load_dataset();
+  if (!train.load_dataset()) {
+    cerr << "cannot load train dataset" << endl;
+    exit(1);
+  }
   cout << "\t"
        << "train data size: " << train.get_size() << endl;
 
   test.load_dataset();
+  if (!train.load_dataset()) {
+    cerr << "cannot load test dataset" << endl;
+    exit(1);
+  }
   cout << "\t"
        << "test data size: " << test.get_size() << endl;
   cout << "\t"
        << "done" << endl;
+
+	cout << "\t" << "minibatch size: " << NUM_MINIBATCH << endl;
 
   /*
 cout << "load network" << endl;
@@ -48,6 +58,7 @@ cout << "\t" << "done" << endl;
   float learning_rate = 1;
   vector<int> random_idx(train.get_size());
   iota(random_idx.begin(), random_idx.end(), 0);
+	shuffle(random_idx.begin(), random_idx.end(), mt19937());
 
   for (int epoch = 0; epoch < NUM_TRAIN; epoch++) {
     cout << "epoch " << epoch + 1 << ": " << endl;
@@ -61,8 +72,6 @@ cout << "\t" << "done" << endl;
     // train
     float train_loss = 0;
     int train_correct = 0;
-    shuffle(random_idx.begin(), random_idx.end(), mt19937());
-
     for (int i = 0; i < train.get_size(); i++) {
       cout << "\r\t"
            << "train: " << i + 1 << "/" << train.get_size() << flush;
@@ -74,7 +83,9 @@ cout << "\t" << "done" << endl;
       train_loss += loss;
       train_correct += is_correct;
 
-      net.backward(train.get_label(random_idx[i]), learning_rate);
+      net.backward(train.get_label(random_idx[i]));
+      if ((i + 1) % NUM_MINIBATCH == 0)
+        net.update_weight(learning_rate, NUM_MINIBATCH);
     }
     cout << endl;
 

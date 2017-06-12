@@ -10,10 +10,12 @@
 using namespace std;
 
 float MultiClassifiedNetwork::activate(const float x) {
+	// return max((double)x, 0.)
   return 1 / (1 + exp(-x));
 }
 
 float MultiClassifiedNetwork::d_activate(const float x) {
+	// return (x > 0) ? 1 : 0;
   float act = activate(x);
   return (1 - act) * act;
 }
@@ -29,6 +31,7 @@ MultiClassifiedNetwork::MultiClassifiedNetwork(vector<int> layer_size)
   output.resize(depth);
   delta.resize(depth);
   weight.resize(depth);
+  error.resize(depth);
 
   for (int l = 0; l < depth; l++) {
     int size = layer_size[l];
@@ -47,10 +50,13 @@ MultiClassifiedNetwork::MultiClassifiedNetwork(vector<int> layer_size)
 
     input[l].resize(size);
     weight[l].resize(size);
+    error[l].resize(size);
     for (int m = 0; m < size; m++) {
       weight[l][m].resize(before_size + 1);
+      error[l][m].resize(before_size + 1);
       for (int n = 0; n < before_size + 1; n++) {
         weight[l][m][n] = dist(engine) / xavier;
+        error[l][m][n] = 0;
       }
     }
   }
@@ -103,7 +109,7 @@ int MultiClassifiedNetwork::predict() {
   return distance(output_layer.begin(), iter);
 }
 
-void MultiClassifiedNetwork::backward(int t, float eta) {
+void MultiClassifiedNetwork::backward(int t) {
   for (int i = 0; i < delta[depth - 1].size(); i++) {
     if (i == t)
       delta[depth - 1][i] = output[depth - 1][i] - 1;
@@ -124,7 +130,18 @@ void MultiClassifiedNetwork::backward(int t, float eta) {
   for (int l = 1; l < depth; l++) {
     for (int j = 0; j < input[l].size(); j++) {
       for (int i = 0; i < output[l - 1].size(); i++) {
-        weight[l][j][i] -= eta * delta[l][j] * output[l - 1][i];
+        error[l][j][i] += delta[l][j] * output[l - 1][i];
+      }
+    }
+  }
+}
+
+void MultiClassifiedNetwork::update_weight(float eta, int minibatch_size) {
+  for (int l = 1; l < depth; l++) {
+    for (int j = 0; j < input[l].size(); j++) {
+      for (int i = 0; i < output[l - 1].size(); i++) {
+        weight[l][j][i] -= eta * (error[l][j][i] / minibatch_size);
+        error[l][j][i] = 0;
       }
     }
   }
@@ -174,6 +191,7 @@ MultiClassifiedNetwork::MultiClassifiedNetwork(const char *filename) {
   output.resize(depth);
   delta.resize(depth);
   weight.resize(depth);
+  error.resize(depth);
 
   for (int l = 0; l < depth; l++) {
     int size = layer_size[l];
@@ -190,10 +208,13 @@ MultiClassifiedNetwork::MultiClassifiedNetwork(const char *filename) {
 
     input[l].resize(size);
     weight[l].resize(size + 1);
+    error[l].resize(size + 1);
     for (int m = 0; m < size + 1; m++) {
       weight[l][m].resize(before_size);
+      error[l].resize(before_size);
       for (int n = 0; n < before_size; n++) {
         ifs >> weight[l][m][n];
+        error[l][m][n] = 0;
       }
     }
   }
