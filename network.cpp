@@ -10,10 +10,12 @@
 using namespace std;
 
 float MultiClassifiedNetwork::activate(const float x) {
+	// return max((double)x, 0.)
   return 1 / (1 + exp(-x));
 }
 
 float MultiClassifiedNetwork::d_activate(const float x) {
+	// return (x > 0) ? 1 : 0;
   float act = activate(x);
   return (1 - act) * act;
 }
@@ -134,11 +136,11 @@ void MultiClassifiedNetwork::backward(int t) {
   }
 }
 
-void MultiClassifiedNetwork::update_weight(float eta = 0.1) {
+void MultiClassifiedNetwork::update_weight(float eta, int minibatch_size) {
   for (int l = 1; l < depth; l++) {
     for (int j = 0; j < input[l].size(); j++) {
       for (int i = 0; i < output[l - 1].size(); i++) {
-        weight[l][j][i] -= eta * error[l][j][i];
+        weight[l][j][i] -= eta * (error[l][j][i] / minibatch_size);
         error[l][j][i] = 0;
       }
     }

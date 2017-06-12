@@ -17,7 +17,7 @@ const string TEST_IMAGE = "./data/t10k-images-idx3-ubyte";
 const string TEST_LABEL = "./data/t10k-labels-idx1-ubyte";
 
 const int NUM_TRAIN = 20;
-const int NUM_MINIBATCH = 10;
+const int NUM_MINIBATCH = 100;
 
 int main(int argc, char **argv) {
   cout << "load datasets:" << endl;
@@ -40,6 +40,8 @@ int main(int argc, char **argv) {
   cout << "\t"
        << "done" << endl;
 
+	cout << "\t" << "minibatch size: " << NUM_MINIBATCH << endl;
+
   /*
 cout << "load network" << endl;
 MultiClassifiedNetwork net(argv[1]);
@@ -56,6 +58,7 @@ cout << "\t" << "done" << endl;
   float learning_rate = 1;
   vector<int> random_idx(train.get_size());
   iota(random_idx.begin(), random_idx.end(), 0);
+	shuffle(random_idx.begin(), random_idx.end(), mt19937());
 
   for (int epoch = 0; epoch < NUM_TRAIN; epoch++) {
     cout << "epoch " << epoch + 1 << ": " << endl;
@@ -69,8 +72,6 @@ cout << "\t" << "done" << endl;
     // train
     float train_loss = 0;
     int train_correct = 0;
-    shuffle(random_idx.begin(), random_idx.end(), mt19937());
-
     for (int i = 0; i < train.get_size(); i++) {
       cout << "\r\t"
            << "train: " << i + 1 << "/" << train.get_size() << flush;
@@ -84,7 +85,7 @@ cout << "\t" << "done" << endl;
 
       net.backward(train.get_label(random_idx[i]));
       if ((i + 1) % NUM_MINIBATCH == 0)
-        net.update_weight(learning_rate);
+        net.update_weight(learning_rate, NUM_MINIBATCH);
     }
     cout << endl;
 

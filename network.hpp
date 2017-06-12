@@ -25,7 +25,7 @@ public:
   MultiClassifiedNetwork(vector<int> layer_size);
   pair<float, bool> forward(vector<float> x, int t);
   void backward(int t);
-  void update_weight(float eta);
+  void update_weight(float eta, int minibatch_size);
   int predict();
   void save(const string filename);
 };
